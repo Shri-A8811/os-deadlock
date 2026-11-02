@@ -8,7 +8,7 @@ An offline-first teaching dashboard for Banker’s algorithm, resource requests,
 - Python + FastAPI algorithm service
 - React Flow resource-allocation graph
 - Recharts Work-vector trace
-- No database, external fonts, remote images, or runtime API calls outside localhost
+- No database or external runtime data; local use calls localhost, and deployed use calls the configured API service
 
 See [AI_DESIGN_GUIDELINES.md](AI_DESIGN_GUIDELINES.md) for the visual and accessibility checklist used for this dashboard.
 
@@ -51,3 +51,14 @@ The interface intentionally uses system fonts and bundled code only, so its layo
 ## Guided simulation
 
 Open the **Simulation** tab for an animated shared-breakfast example of Banker’s scheduling. Three breakfast tasks share two stove spaces and one blender. Use Play, the step controls, or the progress markers to see the scheduler compare each task’s remaining Need with free resources (Work), then return a finished task’s allocation to the kitchen. The animation also supports reduced-motion settings.
+
+## Deploy to Render
+
+The root `render.yaml` defines two free Render services: a static dashboard and the FastAPI algorithm service. The dashboard receives the API URL from Render during its build, and the API accepts requests from the dashboard’s assigned public URL.
+
+1. Push the project to GitHub, including `render.yaml` and the deployment configuration changes.
+2. In Render, create a **Blueprint** and connect the `os-deadlock` repository.
+3. Review the two services and deploy them. Render will show the public dashboard URL when deployment finishes.
+4. Open the dashboard and check the API health endpoint at `<API service URL>/api/health`.
+
+The free API service may spin down after 15 minutes without requests, so its first request after a quiet period can take longer. See [Render’s FastAPI deployment guide](https://render.com/docs/deploy-fastapi) and [Blueprint reference](https://render.com/docs/blueprint-spec).

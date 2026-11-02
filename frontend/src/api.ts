@@ -1,6 +1,6 @@
 import type { RequestResult, SafetyResult } from './types'
 
-const API = 'http://127.0.0.1:8000'
+const API = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '')
 
 async function post<T>(path: string, body: unknown): Promise<T> {
   const response = await fetch(`${API}${path}`, {
