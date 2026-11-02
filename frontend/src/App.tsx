@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useState, type CSSProperties } from 'react'
-import { Activity, ArrowDownRight, ArrowRight, Check, CircleHelp, Cpu, Pause, Play, RotateCcw, Shield, SkipBack, SkipForward, TriangleAlert, Workflow, X } from 'lucide-react'
+import { Activity, ArrowDownRight, ArrowRight, Check, CircleHelp, CookingPot, Cpu, Pause, Play, RotateCcw, Shield, SkipBack, SkipForward, TriangleAlert, Workflow, X } from 'lucide-react'
 import { Background, Controls, ReactFlow, type Edge, type Node } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { analyzeSafety, checkRequest, detectDeadlock } from './api'
+import Simulation from './Simulation'
 import { scenarios } from './data'
 import type { RequestResult, SafetyResult, Scenario, TraceStep } from './types'
 
-type Tab = 'avoidance' | 'detection' | 'prevention'
+type Tab = 'avoidance' | 'detection' | 'prevention' | 'simulation'
 const resourceColors = ['#cf7146', '#638d79', '#6878a8', '#b28b40', '#9a6b8f']
 const copy = <T,>(value: T): T => JSON.parse(JSON.stringify(value)) as T
 
@@ -161,16 +162,17 @@ function App() {
         <button className={tab === 'avoidance' ? 'active' : ''} onClick={() => setTab('avoidance')}><Shield size={16} /> Avoidance <span className="tab-index">01</span></button>
         <button className={tab === 'detection' ? 'active' : ''} onClick={() => setTab('detection')}><Workflow size={16} /> Detection <span className="tab-index">02</span></button>
         <button className={tab === 'prevention' ? 'active' : ''} onClick={() => setTab('prevention')}><Activity size={16} /> Prevention & recovery <span className="tab-index">03</span></button>
+        <button className={tab === 'simulation' ? 'active' : ''} onClick={() => setTab('simulation')}><CookingPot size={16} /> Simulation <span className="tab-index">04</span></button>
         <span className="tabs-note"><CircleHelp size={14} /> Unsafe ≠ deadlocked</span>
       </nav>
 
-      <section className="scenario-strip" aria-label="Example scenarios">
+      {tab !== 'simulation' && <section className="scenario-strip" aria-label="Example scenarios">
         <div className="scenario-label">LOAD EXAMPLE</div>
         <div className="scenario-buttons">
           {Object.entries(scenarios).map(([key, value], index) => <button key={key} aria-pressed={scenarioKey === key} className={`scenario-chip ${scenarioKey === key ? 'selected' : ''}`} onClick={() => chooseScenario(key)}><span className="scenario-number">0{index + 1}</span>{value.title}<ArrowRight size={13} /></button>)}
         </div>
         <div className="scenario-description">{scenario.description}</div>
-      </section>
+      </section>}
 
       {tab === 'avoidance' && <div className="workspace-grid">
         <section className="panel input-panel">
@@ -212,6 +214,8 @@ function App() {
         <section className="panel comparison-panel"><div className="panel-header"><div><div className="panel-kicker">TRADE-OFF</div><h2>What changes with the policy?</h2></div><span className="policy-tag">ORDERED ACQUISITION</span></div><div className="comparison-grid"><div className="comparison-side original"><span className="comparison-kicker">WITHOUT POLICY</span><h3>Flexible acquisition</h3><div className="resource-flow"><span>P0</span><ArrowRight size={14}/><b>R1</b><span className="flow-and">while waiting for</span><b>R0</b></div><p>Processes may hold resources in conflicting orders; circular wait remains possible.</p><span className="mini-state risk">CIRCULAR WAIT POSSIBLE</span></div><div className="comparison-divider"><ArrowRight size={16}/></div><div className="comparison-side modified"><span className="comparison-kicker">WITH GLOBAL ORDER</span><h3>Acquisition follows rank</h3><div className="ordered-resources">{scenario.available.map((_,r)=><span key={r} style={{'--resource-color':resourceColors[r%resourceColors.length]} as CSSProperties}>R{r}<small>{String(r+1).padStart(2,'0')}</small></span>)}</div><p>Requests move only forward in the order. Concurrency can fall when a process must wait to acquire resources in sequence.</p><span className="mini-state protected">CIRCULAR WAIT ELIMINATED</span></div></div><div className="caveat"><CircleHelp size={15}/><span>Prevention guarantees this condition is absent only when every process follows the policy. It may reduce resource utilization and concurrency.</span></div></section>
         <section className="panel policy-practice"><div className="policy-practice-heading"><div><div className="panel-kicker">TRY THE POLICY</div><h2>Is this request order allowed?</h2></div><button className={`policy-toggle ${orderPolicyEnabled?'enabled':''}`} aria-pressed={orderPolicyEnabled} onClick={()=>setOrderPolicyEnabled(value=>!value)}><span/>{orderPolicyEnabled?'POLICY ON':'POLICY OFF'}</button></div><p>Assume a process already holds R2 and next requests R0.</p><div className="policy-check"><div className="held-sequence"><span className="held-label">HELD</span><b>R2</b></div><ArrowRight size={17}/><div className="held-sequence"><span className="held-label">REQUEST</span><b className="request-resource">R0</b></div><span className={`mini-state ${orderPolicyEnabled?'risk':'protected'}`}>{orderPolicyEnabled?'REQUEST REJECTED':'REQUEST ALLOWED'}</span></div><p className="practice-explanation">{orderPolicyEnabled?'The process must release R2 before requesting lower-ranked R0. This enforces the global order and prevents circular wait.':'Without the policy, the request order is allowed; this can contribute to circular wait when processes hold and request resources in conflicting orders.'}</p></section>
       </div>}
+
+      {tab === 'simulation' && <Simulation />}
 
       <footer className="footer-note"><span>DEADLOCK LAB <i>·</i> INTERACTIVE OS CONCEPTS</span><span>All computations run locally <span className="footer-separator">/</span> no external data</span></footer>
     </main>

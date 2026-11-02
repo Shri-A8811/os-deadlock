@@ -47,3 +47,7 @@ Double-click `run_dashboard.bat`, or run `py start.py` here. The launcher starts
 Built-in examples cover a safe state, a request deferred for insufficient Available resources, a request denied because it would make the state unsafe, a two-process circular wait with one instance of each resource, and a zero-Available boundary case where a zero-Need process can still finish.
 
 The interface intentionally uses system fonts and bundled code only, so its layout and behavior do not depend on internet access during the demo.
+
+## Guided simulation
+
+Open the **Simulation** tab for an animated shared-breakfast example of Banker’s scheduling. Three breakfast tasks share two stove spaces and one blender. Use Play, the step controls, or the progress markers to see the scheduler compare each task’s remaining Need with free resources (Work), then return a finished task’s allocation to the kitchen. The animation also supports reduced-motion settings.
