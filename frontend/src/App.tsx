@@ -217,7 +217,7 @@ function App() {
 
       {tab === 'simulation' && <Simulation />}
 
-      <footer className="footer-note"><span>DEADLOCK LAB <i>·</i> INTERACTIVE OS CONCEPTS</span><span>All computations run locally <span className="footer-separator">/</span> no external data</span></footer>
+      <footer className="footer-note"><span>DEADLOCK LAB <i>·</i> INTERACTIVE OS CONCEPTS</span><span>All computations run locally <span className="footer-separator">/</span> no external data</span><div className="team-credits" aria-label="Project team and guide"><span><b>TEAM</b> Shridhar Ambore · Mayuresh Rekhate · Ritesh Boje · Amrut Andhale</span><span><b>GUIDE</b> Dr. Vijay Kumar Mantri</span></div></footer>
     </main>
   </div>
 }
